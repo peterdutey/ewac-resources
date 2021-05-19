@@ -1,17 +1,29 @@
 Package: EWAC
-Title: R functions to calculate the EWAC using the Extended AUDIT-C
-Version: 0.0.0.9000
+Title: R Package to Compute an Estimator of Weekly Alcohol Consumption (EWAC) from the Extended AUDIT-C
+Version: 0.0.1
 Authors@R: c(
   person(given = "Peter",
            family = "Dutey-Magni",
            role = c("aut", "cre"),
-           email = "p.dutey-magni@ucl.ac.uk@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID")),
-  person("University of Southampton", role = "cph")
-)
+           email = "p.dutey-magni@ucl.ac.uk",
+           comment = c(ORCID = "0000-0002-8942-9836")),
+  person("University of Southampton", role = "cph"))
 Description: >
-  This package provides functions to compute an Estimator of Weekly Alcohol Consumption (EWAC) 
+  Compute an Estimator of Weekly Alcohol Consumption (EWAC) 
   from the Extended Alcohol Use Disorders Identification Tool.
+URL: https://github.com/peterdutey/ewac-resources/
+BugReports: https://github.com/peterdutey/ewac-resources/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.1
+Depends: R (>= 2.10)
+Imports: Rdpack (>= 0.7)
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RdMacros: Rdpack
+Collate: 
+  'EWAC-package.R'
+  'default_coefficients.R'
+  'example_ewac.R'
+  'functions.R'

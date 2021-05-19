@@ -1,133 +1,95 @@
-
+.validate_auditc_input <- function(x) {
+  x_valid <- c("audit1_label", "audit2_label", "audit3_label") %in% colnames(x)
+  if ( any(!x_valid) ) {
+    stop("`x` must contain columns:\n",
+         paste(c("audit1_label", "audit2_label", "audit3_label")[!x_valid], collapse = ", "),
+         call. = FALSE)
+  }
+}
 
 #' Compute the AUDIT-C score
-#' 
-#' @description Compute the traditional AUDIT-C score from Extended AUDIT-C data 
 #'
-#' @param data a data frame containing Extended AUDIT-C data
-#' @param audit1  
-#' @param coefficients a list of EWAC coefficients (see \code{\link[EWAC]{get_ewac_coefficients}()})
-#' @param zero_if_never_drinks a boolean indicating whether an AUDIT-C score of zero should be 
+#' @description Compute the traditional AUDIT-C score from Extended AUDIT-C data
+#'
+#' @param x a data frame or matrix with three character columns containing, in order: \describe{
+#'    \item{audit1_label}{a value in \code{'Never'}, \code{'Monthly or less'},
+#'                        \code{'2 to 4 times a month'}, \code{'2 to 3 times a week'},
+#'                        \code{'4 to 5 times a week'}, \code{'6 or more times a week'}}
+#'    \item{audit2_label}{a value in \code{"1 to 2"}, \code{"3 to 4"}, \code{"5 to 6"},
+#'                        \code{"7 to 9"}, \code{"10 to 12"}, \code{"13 to 15"}, \code{"16 or more"}}
+#'    \item{audit3_label}{a value in \code{"Never"}, \code{"Less than monthly"}, \code{"Monthly"},
+#'                        \code{"Weekly"}, \code{"Daily or almost daily"}}
+#' }
+#' @param audit_coefficients a list of coefficients (default: \code{\link[EWAC]{default_coefficients}})
+#' @param zero_if_never_drinks a boolean indicating whether an AUDIT-C score of zero should be
 #' given by default if AUDIT-1 = 'Never'. Default is FALSE.
 #'
 #' @return a vector of AUDIT-C score between 0 and 12.
 #' @export
 #' @examples
-compute_AUDITC_score <- function(audit1, audit2, audit3, 
-                                 coefficients = get_ewac_coefficients(), zero_if_never_drinks = FALSE){
-  
-  
-  
-  X[,c("audit1_score")] <- audit_coef$audit1[match(X[,1], audit_coef$audit1$audit1_label), c("audit1_score")]
-  X[,c("audit2_score")] <- audit_coef$audit2[match(X[,2], audit_coef$audit2$audit2_label), c("audit2_score")]
-  X[,c("audit3_score")] <- audit_coef$audit3[match(X[,3], audit_coef$audit3$audit3_label), c("audit3_score")]
-  
+#' compute_auditc_score(data.frame(list(
+#'    audit1_label = "2 to 3 times a week",
+#'    audit2_label = "1 to 2",
+#'    audit3_label = "Monthly"
+#' )))
+compute_auditc_score <- function(x,
+                                 audit_coefficients = default_coefficients,
+                                 zero_if_never_drinks = FALSE){
+
+  .validate_auditc_input(x)
+
+  x[,c("audit1_score")] <- audit_coefficients$audit1[match(x[["audit1_label"]], audit_coefficients$audit1$audit1_label), c("audit1_score")]
+  x[,c("audit2_score")] <- audit_coefficients$audit2[match(x[["audit2_label"]], audit_coefficients$audit2$audit2_label), c("audit2_score")]
+  x[,c("audit3_score")] <- audit_coefficients$audit3[match(x[["audit3_label"]], audit_coefficients$audit3$audit3_label), c("audit3_score")]
+
   if(zero_if_never_drinks){
-    X$audit1_score + ifelse(X$audit1_score == 0, 0, X$audit2_score + X$audit3_score )
+    x$audit1_score + ifelse(x$audit1_score == 0, 0, x$audit2_score + x$audit3_score )
   } else {
-    X$audit1_score + X$audit2_score + X$audit3_score 
+    x$audit1_score + x$audit2_score + x$audit3_score
   }
 }
 
-proc_AUDIT_risk <- function(X){
-  # Compute Public Health England alcohol risk levels
-  # X: vector of AUDIT-C scores
-  cut(X, breaks = c(0, 5, 8, 13), right = F,
-      labels = c("Low", "Increasing", "High"))
-}
+#' Compute the EWAC
+#'
+#' @description Compute the Estimated Weekly Alcohol Consumption from Extended AUDIT-C data
+#'
+#' @param x a data frame or matrix with three character columns containing, in order: \describe{
+#'    \item{audit1_label}{a value in \code{'Never'}, \code{'Monthly or less'},
+#'                        \code{'2 to 4 times a month'}, \code{'2 to 3 times a week'},
+#'                        \code{'4 to 5 times a week'}, \code{'6 or more times a week'}}
+#'    \item{audit2_label}{a value in \code{"1 to 2"}, \code{"3 to 4"}, \code{"5 to 6"},
+#'                        \code{"7 to 9"}, \code{"10 to 12"}, \code{"13 to 15"}, \code{"16 or more"}}
+#'    \item{audit3_label}{a value in \code{"Never"}, \code{"Less than monthly"}, \code{"Monthly"},
+#'                        \code{"Weekly"}, \code{"Daily or almost daily"}}
+#' }
+#' @param audit_coefficients a list of coefficients (default: \code{\link[EWAC]{default_coefficients}})
+#' @param uk_units if \code{TRUE} (the default), the result is expressed in
+#' alcohol units (8g or 10mL of pure ethanol) per week.
+#' If \code{FALSE}, the result is expressed in grams per week.
+#' @return a numeric vector
+#' @export
+#' @examples
+#' compute_ewac(data.frame(list(
+#'    audit1_label = "2 to 3 times a week",
+#'    audit2_label = "1 to 2",
+#'    audit3_label = "Monthly"
+#' )))
+compute_ewac <- function(x, audit_coefficients = default_coefficients, uk_units = TRUE){
 
+  .validate_auditc_input(x)
+  stopifnot(is.logical(uk_units))
 
-proc_EWAC <- function(X, audit_coef, method = "qfv"){
-  # Compute the EWAC
-  # X:                 data.frame containing AUDIT1, AUDIT2, and AUDIT3 columns in order 
-  # audit_coef:        list of coefficients to apply to AUDIT response items (see audit_weights.R)
-  # method:            character string indicating the estimation method: 
-  #                      - "qfv" for the quantity-frequency-variably method
-  #                      - "qf" for the simple quantity-frequency method.
-  # binge.val:         number of UK units assumed for a bringe drinking session. Default is 8.
-  
-  X[,c("audit1_value")] <- audit_coef$audit1[match(X[,1], audit_coef$audit1$audit1_label), c("audit1_value")]
-  X[,c("audit2_value")] <- audit_coef$audit2[match(X[,2], audit_coef$audit2$audit2_label), c("audit2_value")]
-  X[,c("audit3_value")] <- audit_coef$audit3[match(X[,3], audit_coef$audit3$audit3_label), c("audit3_value")]
-  binge.val <- audit_coef$binge_value
-  if (method == "qf"){
-    
-    ( X$audit1_value * ifelse(X$audit1_value==0, NA, 
-                              X$audit2_value) ) /52.1 
-    
-  } else if (method == "qv"){
-    
-    ( X$audit2_value * X$audit3_value ) / 52.1 
-    
-  } else if (method == "qfv") {
-    
-    ( (X$audit1_value * X$audit2_value ) + 
-        (X$audit3_value * binge.val ) ) / 52.1
-    
-  } else if (method == "qb") {
-    
-    ( X$audit3_value * binge.val ) / 52.1
-    
-  } else if (method == "ewac") {
-    
-    ifelse(X$audit2_value >= binge.val,
-           ifelse(X$audit1_value >= X$audit3_value,
-                  #QF:
-                  X$audit1_value * X$audit2_value  / 52.1,
-                  #QV:
-                  X$audit3_value * X$audit2_value  / 52.1),
-           ifelse(X$audit1_value >= X$audit3_value,
-                  #binge x F
-                  X$audit1_value * binge.val / 52.1, 
-                  #QF + binge x V
-                  ((X$audit1_value * X$audit2_value ) + (X$audit3_value * binge.val ) ) /52.1))
-    
-    
+  x[,c("audit1_value")] <- audit_coefficients$audit1[match(x[["audit1_label"]], audit_coefficients$audit1$audit1_label), c("audit1_value")]
+  x[,c("audit2_value")] <- audit_coefficients$audit2[match(x[["audit2_label"]], audit_coefficients$audit2$audit2_label), c("audit2_value")]
+  x[,c("audit3_value")] <- audit_coefficients$audit3[match(x[["audit3_label"]], audit_coefficients$audit3$audit3_label), c("audit3_value")]
+  binge.val <- audit_coefficients$binge_value
+
+  ewac_uk <- ( (x$audit1_value * x$audit2_value ) + (x$audit3_value * binge.val ) )
+
+  if (uk_units) {
+    ewac_uk
   } else {
-    
-    stop("Invalid method input.")
-    
+    ewac_uk * 8.0
   }
-  
 }
 
-
-get_ewac_coefficients <- function(){
-  list(
-    audit1= data.frame(list(
-      audit1_label = c('Never', 'Monthly or less',
-                       '2 to 4 times a month', '2 to 3 times a week',
-                       '4 to 5 times a week', '6 or more times a week'),
-      audit1_value = c(0,
-                       9.509,
-                       29.292,
-                       84.089,
-                       173.247,
-                       269.874),
-      audit1_score = c( 0L, 1L, 2L, 3L, 4L, 4L))),
-    
-    audit2 = data.frame(list(
-      audit2_label = c("1 to 2", "3 to 4", "5 to 6",
-                       "7 to 9", "10 to 12", "13 to 15", "16 or more"),
-      audit2_value = c(2.422,
-                       4.342,
-                       5.842,
-                       6.891,
-                       9.67,
-                       9.725,
-                       17.832),
-      audit2_score = c(0L, 1L, 2L, 3L, 4L, 4L, 4L))),
-    
-    audit3 = data.frame(list(
-      audit3_label = c("Never", "Less than monthly", "Monthly",
-                       "Weekly", "Daily or almost daily"),
-      audit3_value = c(4.383,
-                       15.154,
-                       29.542,
-                       63.061,
-                       5 * 365 / 7),
-      audit3_score = 0:4)),
-    
-    binge_value = 6.448
-  )
-}

@@ -1,4 +1,5 @@
-^EWAC\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^data-raw$
 ^spreadsheets$
