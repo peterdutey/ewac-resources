@@ -1,4 +1,4 @@
-# <img src="man/figures/logo.svg" align="right" style="max-width: 30%; padding: 10px;"/>EWAC: Resources to Estimate Weekly Alcohol Consumption from the Extended AUDIT-C
+# <img src="man/figures/logo.svg" align="right" width="150px"/>EWAC: Resources to Estimate Weekly Alcohol Consumption from the Extended AUDIT-C
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/peterdutey/ewac-resources/workflows/R-CMD-check/badge.svg)](https://github.com/peterdutey/ewac-resources/actions)
