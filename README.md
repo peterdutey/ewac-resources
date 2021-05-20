@@ -1,7 +1,11 @@
 # <img src="man/figures/logo.svg" align="right" style="max-width: 30%; padding: 10px;"/>EWAC: Resources to Estimate Weekly Alcohol Consumption from the Extended AUDIT-C
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/peterdutey/ewac-resources/workflows/R-CMD-check/badge.svg)](https://github.com/peterdutey/ewac-resources/actions)
+<!-- badges: end -->
 
-This repository contain resources to implement the Estimator of Weekly Alcohol Consumption (EWAC) developed and validated in a pre-print manuscript available from **medRxiv** (DOI: [](https://doi.org/)).
+
+This repository contain resources to implement the Estimator of Weekly Alcohol Consumption (EWAC) developed and validated in a pre-print manuscript available from *medRxiv* (DOI: [10.1101/2020.12.11.20247106](https://doi.org/10.1101/2020.12.11.20247106)).
 
 
 ## R package

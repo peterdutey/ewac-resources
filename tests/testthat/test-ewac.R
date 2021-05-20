@@ -107,8 +107,20 @@ test_that("compute_auditc_score", {
       audit2_label = "3 to 4"
     )))
   )
+  expect_equal(
+    compute_auditc_score(data.frame(list(
+      audit1_label = "Never",
+      audit2_label = "3 to 4",
+      audit3_label = "Never"
+    )), zero_if_never_drinks = T),
+    0
+  )
+  expect_equal(
+    compute_auditc_score(data.frame(list(
+      audit1_label = "Never",
+      audit2_label = "3 to 4",
+      audit3_label = "Never"
+    )), zero_if_never_drinks = F),
+    1
+  )
 })
-
-
-
-

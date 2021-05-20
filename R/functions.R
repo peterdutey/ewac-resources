@@ -43,7 +43,7 @@ compute_auditc_score <- function(x,
   x[,c("audit3_score")] <- audit_coefficients$audit3[match(x[["audit3_label"]], audit_coefficients$audit3$audit3_label), c("audit3_score")]
 
   if(zero_if_never_drinks){
-    x$audit1_score + ifelse(x$audit1_score == 0, 0, x$audit2_score + x$audit3_score )
+    x$audit1_score + ifelse(x$audit1_score == 0, 0, x$audit2_score + x$audit3_score)
   } else {
     x$audit1_score + x$audit2_score + x$audit3_score
   }
