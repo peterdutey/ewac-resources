@@ -5,7 +5,7 @@
 <!-- badges: end -->
 
 
-This repository contain resources to implement the Estimator of Weekly Alcohol Consumption (EWAC) developed and validated in a pre-print manuscript available from *medRxiv* (DOI: [10.1101/2020.12.11.20247106](https://doi.org/10.1101/2020.12.11.20247106)).
+This repository contain resources to implement the Estimator of Weekly Alcohol Consumption (EWAC) developed and validated in a peer-reviewed journal article available from *Addiction* (DOI: [10.1111/add.15662](https://doi.org/10.1111/add.15662)).
 
 
 ## R package
